@@ -5,31 +5,25 @@ var url = require('url');
 var dgram = require('dgram');
 var int53 = require('int53');
 
-var misc = require('./misc');
-var panic = misc.panic;
+var Torrent = require('./lib/torrent');
+var u = require('./lib/u');
+var panic = u.panic;
 
 var raw = fs.readFileSync('./entourage.2015.1080p.hc.webrip.x264.aac.torrent')
 var torrent = bencode.decode(raw)
 
-var torrent2 = bencode.decode(raw, 'utf8')
-// console.log(torrent2)
+var href = './entourage.2015.1080p.hc.webrip.x264.aac.torrent'
 
-var pieces = _.chunk(torrent.info.pieces, 20)
-
-pieces = _.map(pieces, function (piece) {
-  var hex = _.map(piece, function (i) { return i.toString(16) })
-  return hex.join('')
-})
-
-console.log(pieces[7753])
-
-process.exit(0)
-
+var torrent = Torrent(href)
+if (!torrent) {
+  panic('unknown input')
+}
 
 var counter = 0
 
-var peerId =  misc.peerId()
-var infoHash = misc.infoHash(torrent)
+
+console.log(torrent.peerId)
+
 var announce = torrent.announce.toString()
 
 var url = url.parse(announce)
@@ -38,6 +32,7 @@ if (!_.startsWith(url.protocol, 'udp')) {
   panic('Only udp trackers are supported')
 }
 
+process.exit(0)
 var transactionId = 0x3455333;
 
 var udp = dgram.createSocket('udp4', function (message) {
