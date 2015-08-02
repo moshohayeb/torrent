@@ -11,6 +11,21 @@ var panic = misc.panic;
 var raw = fs.readFileSync('./entourage.2015.1080p.hc.webrip.x264.aac.torrent')
 var torrent = bencode.decode(raw)
 
+var torrent2 = bencode.decode(raw, 'utf8')
+// console.log(torrent2)
+
+var pieces = _.chunk(torrent.info.pieces, 20)
+
+pieces = _.map(pieces, function (piece) {
+  var hex = _.map(piece, function (i) { return i.toString(16) })
+  return hex.join('')
+})
+
+console.log(pieces[7753])
+
+process.exit(0)
+
+
 var counter = 0
 
 var peerId =  misc.peerId()
